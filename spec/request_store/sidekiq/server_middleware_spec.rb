@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 RSpec.describe RequestStore::Sidekiq::ServerMiddleware do
-  let(:worker)  { class_double('Worker') }
-  let(:job)     { Hash.new }
-  let(:queue)   { 'default' }
-  let(:store)   { { a: 1 } }
+  let(:worker) { class_double('Worker') }
+  let(:job)    { {} }
+  let(:queue)  { 'default' }
+  let(:store)  { { a: 1 } }
 
   shared_examples 'a cleared request store' do
     it 'clears the request store' do
@@ -27,7 +27,10 @@ RSpec.describe RequestStore::Sidekiq::ServerMiddleware do
 
   context 'when the worker raises an error' do
     before do
-      allow_any_instance_of(worker).to receive(:perform).and_raise(ArgumentError)
+      allow_any_instance_of(worker).to(
+        receive(:perform)
+          .and_raise(ArgumentError)
+      )
     end
 
     it_behaves_like 'a cleared request store'
@@ -36,7 +39,10 @@ RSpec.describe RequestStore::Sidekiq::ServerMiddleware do
 
   context 'when the worker completes successfully' do
     before do
-      allow_any_instance_of(worker).to receive(:perform).and_return(true)
+      allow_any_instance_of(worker).to(
+        receive(:perform)
+          .and_return(true)
+      )
     end
 
     it_behaves_like 'a cleared request store'
