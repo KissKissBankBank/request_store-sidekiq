@@ -28,6 +28,5 @@ describe RequestStore::Sidekiq do
         be_exists(RequestStore::Sidekiq::ClientMiddleware)
       )
     end
-
   end
 end
