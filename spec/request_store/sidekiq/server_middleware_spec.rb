@@ -4,6 +4,7 @@ RSpec.describe RequestStore::Sidekiq::ServerMiddleware do
   let(:worker)  { class_double('Worker') }
   let(:job)     { Hash.new }
   let(:queue)   { 'default' }
+  let(:store)   { { a: 1 } }
 
   shared_examples 'a cleared request store' do
     it 'clears the request store' do
@@ -13,12 +14,24 @@ RSpec.describe RequestStore::Sidekiq::ServerMiddleware do
     end
   end
 
+  shared_examples 'a restored request store' do
+    it 'restores the request store' do
+      # ClientMiddleware setup the store.
+      job['request_store'] = store
+
+      subject.call(worker, job, queue) do
+        expect(::RequestStore.store).to eq(store)
+      end
+    end
+  end
+
   context 'when the worker raises an error' do
     before do
       allow_any_instance_of(worker).to receive(:perform).and_raise(ArgumentError)
     end
 
     it_behaves_like 'a cleared request store'
+    it_behaves_like 'a restored request store'
   end
 
   context 'when the worker completes successfully' do
@@ -27,5 +40,6 @@ RSpec.describe RequestStore::Sidekiq::ServerMiddleware do
     end
 
     it_behaves_like 'a cleared request store'
+    it_behaves_like 'a restored request store'
   end
 end

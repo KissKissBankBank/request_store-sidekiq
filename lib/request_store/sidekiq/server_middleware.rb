@@ -1,7 +1,11 @@
+require 'pry'
 module RequestStore
   module Sidekiq
     class ServerMiddleware
-      def call(worker, job, queue)
+      def call(_worker, job, _queue)
+        if job['request_store'].present?
+          ::RequestStore.store.merge!(job['request_store'])
+        end
         yield
       ensure
         ::RequestStore.clear!
