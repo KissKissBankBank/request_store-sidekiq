@@ -15,12 +15,33 @@ RSpec.describe RequestStore::Sidekiq::ServerMiddleware do
   end
 
   shared_examples 'a restored request store' do
-    it 'restores the request store' do
-      # ClientMiddleware setup the store.
-      job['request_store'] = store
+    context 'when restoring is enabled' do
+      before do
+        ::RequestStore::Sidekiq.configure { |config| config.restore = true }
+      end
 
-      subject.call(worker, job, queue) do
-        expect(::RequestStore.store).to eq(store)
+      after do
+        ::RequestStore::Sidekiq.configure { |config| config.restore = false }
+      end
+
+      it 'restores the request store' do
+        # ClientMiddleware setup the store.
+        job['request_store'] = store
+
+        subject.call(worker, job, queue) do
+          expect(::RequestStore.store).to eq(store)
+        end
+      end
+    end
+
+    context 'when restoring is disabled' do
+      it 'do not restores the request store' do
+        # ClientMiddleware setup the store.
+        job['request_store'] = store
+
+        subject.call(worker, job, queue) do
+          expect(::RequestStore.store).to eq({})
+        end
       end
     end
   end

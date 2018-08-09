@@ -2,7 +2,10 @@ module RequestStore
   module Sidekiq
     class ClientMiddleware
       def call(_worker_class, item, _queue, _redis_pool = nil)
-        item['request_store'] = ::RequestStore.store
+        if ::RequestStore::Sidekiq.configuration.restore
+          item['request_store'] = ::RequestStore.store
+        end
+
         yield
       end
     end

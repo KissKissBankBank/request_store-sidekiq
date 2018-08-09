@@ -2,6 +2,7 @@ require "request_store"
 require "sidekiq"
 
 require "request_store/sidekiq/version"
+require "request_store/sidekiq/configuration"
 require "request_store/sidekiq/client_middleware"
 require "request_store/sidekiq/server_middleware"
 require "request_store/sidekiq/railtie" if defined?(Rails::Railtie)
