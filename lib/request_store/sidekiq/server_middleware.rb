@@ -1,4 +1,3 @@
-require 'pry'
 module RequestStore
   module Sidekiq
     class ServerMiddleware
